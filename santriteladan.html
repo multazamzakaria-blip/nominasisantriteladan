@@ -312,12 +312,56 @@
             transition: all 0.2s;
         }
 
+        .btn-delete:hover {
+            background-color: #fca5a5;
+        }
+
         .empty-state {
             padding: 30px;
             text-align: center;
             color: var(--text-muted);
             font-style: italic;
         }
+
+        /* Tambahan CSS untuk Tombol Detail Rincian Skor */
+        .btn-detail {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            color: #4b5563;
+            margin-left: 10px;
+            transition: background 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-detail:hover {
+            background: #e5e7eb;
+            color: var(--primary);
+        }
+
+        .rincian-skor {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            font-size: 11px;
+            flex-wrap: wrap;
+        }
+
+        .badge-skor {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-s { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .badge-p { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-i { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .badge-r { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+        .badge-e { background: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3; }
+
     </style>
 </head>
 <body>
@@ -561,6 +605,16 @@
         return selected ? parseInt(selected.value) : 0;
     }
 
+    // Fungsi Toggle Rincian Skor
+    function toggleDetail(id) {
+        let el = document.getElementById(id);
+        if (el.style.display === "none") {
+            el.style.display = "flex";
+        } else {
+            el.style.display = "none";
+        }
+    }
+
     document.getElementById('formPenilaian').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -578,23 +632,20 @@
         let eVal = getRadioVal('e1') + getRadioVal('e2') + getRadioVal('e3');
         let totalKeseluruhan = s + p + i + r + eVal;
 
-        let kategori = "";
-        let idKategori = "";
-        if (s < 6 || p < 6 || i < 6 || r < 6 || eVal < 6) {
-            kategori = "Belum Memenuhi Kriteria Teladan";
-            idKategori = "gagal";
-        } else {
-            let nilaiDimensi = [
-                { id: "s", nama: "Anugerah Cahaya Spiritual", skor: s },
-                { id: "p", nama: "Anugerah Cahaya Fisik", skor: p },
-                { id: "i", nama: "Anugerah Cahaya Intelektual", skor: i },
-                { id: "r", nama: "Anugerah Cahaya Relasional", skor: r },
-                { id: "e", nama: "Anugerah Cahaya Emosional", skor: eVal }
-            ];
-            nilaiDimensi.sort((a, b) => b.skor - a.skor);
-            kategori = nilaiDimensi[0].nama;
-            idKategori = nilaiDimensi[0].id;
-        }
+        // Semua santri diloloskan dan dipilih berdasarkan skor dimensi tertinggi
+        let nilaiDimensi = [
+            { id: "s", nama: "Anugerah Cahaya Spiritual", skor: s },
+            { id: "p", nama: "Anugerah Cahaya Fisik", skor: p },
+            { id: "i", nama: "Anugerah Cahaya Intelektual", skor: i },
+            { id: "r", nama: "Anugerah Cahaya Relasional", skor: r },
+            { id: "e", nama: "Anugerah Cahaya Emosional", skor: eVal }
+        ];
+        
+        // Urutkan untuk mencari dimensi dengan skor paling tinggi
+        nilaiDimensi.sort((a, b) => b.skor - a.skor);
+        
+        let kategori = nilaiDimensi[0].nama;
+        let idKategori = nilaiDimensi[0].id;
 
         let santriBaru = { 
             nama, s, p, i, r, e: eVal, 
@@ -646,7 +697,7 @@
             <div class="table-container">`;
             
             if(top10.length === 0) {
-                htmlTabel += `<div class="empty-state">Belum ada kandidat yang memenuhi kriteria di kategori ini.</div>`;
+                htmlTabel += `<div class="empty-state">Belum ada kandidat di kategori ini.</div>`;
             } else {
                 htmlTabel += `
                 <table>
@@ -654,9 +705,9 @@
                         <tr>
                             <th width="60">Rank</th>
                             <th style="text-align:left;">Nama Santri</th>
-                            <th width="120">Skor Dimensi</th>
+                            <th width="120">Skor Utama</th>
                             <th width="120">Total SPIRE</th>
-                            <th width="80">Hapus</th>
+                            <th width="80">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>`;
@@ -666,7 +717,19 @@
                     htmlTabel += `
                         <tr>
                             <td class="ranking" style="${rankStyle}">#${index + 1}</td>
-                            <td class="nama-santri">${santri.nama}</td>
+                            <td class="nama-santri">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>${santri.nama}</span>
+                                    <button type="button" class="btn-detail" onclick="toggleDetail('detail-${santri.key}')">🔍 Rincian</button>
+                                </div>
+                                <div id="detail-${santri.key}" class="rincian-skor" style="display:none;">
+                                    <span class="badge-skor badge-s">S: ${santri.s}</span>
+                                    <span class="badge-skor badge-p">P: ${santri.p}</span>
+                                    <span class="badge-skor badge-i">I: ${santri.i}</span>
+                                    <span class="badge-skor badge-r">R: ${santri.r}</span>
+                                    <span class="badge-skor badge-e">E: ${santri.e}</span>
+                                </div>
+                            </td>
                             <td><strong style="color:var(--primary);">${santri[kat.kunci]}</strong> / 12</td>
                             <td>${santri.total} / 60</td>
                             <td><button class="btn-delete" onclick="hapusData('${santri.key}', '${santri.nama}')">✕</button></td>
