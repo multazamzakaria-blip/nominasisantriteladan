@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen Anugerah CAHAYA - Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-light: #10b981;
+            --accent: #d97706;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            font-size: 28px;
+        }
+
+        .header h2 {
+            color: var(--accent);
+            font-weight: 500;
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 15px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background-color: #ecfdf5;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(4, 120, 87, 0.2);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .input-nama {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s;
+            background-color: #f9fafb;
+        }
+
+        .input-nama:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background-color: white;
+        }
+
+        .dimensi-box {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .dimensi-title {
+            color: var(--primary);
+            margin-top: 0;
+            border-bottom: 2px solid #ecfdf5;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .indikator-block {
+            margin-bottom: 25px;
+            background-color: #fcfdfd;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #f3f4f6;
+        }
+
+        .indikator-label {
+            font-size: 15px;
+            color: var(--text-main);
+            margin-bottom: 15px;
+        }
+
+        .indikator-label strong {
+            color: #111827;
+            font-size: 16px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .indikator-label small {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-card {
+            display: flex;
+            align-items: flex-start;
+            padding: 14px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+        }
+
+        .radio-card:hover {
+            border-color: #a7f3d0;
+            background-color: #ecfdf5;
+        }
+
+        .radio-card input[type="radio"] {
+            margin-top: 3px;
+            margin-right: 15px;
+            transform: scale(1.3);
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .radio-card span {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.5;
+        }
+
+        .radio-card:has(input[type="radio"]:checked) {
+            border-color: var(--primary);
+            background-color: #ecfdf5;
+            box-shadow: 0 2px 4px rgba(4, 120, 87, 0.1);
+        }
+        
+        .radio-card:has(input[type="radio"]:checked) span {
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        button.submit-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        button.submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .kategori-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            margin-top: 40px;
+            margin-bottom: 0;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f9fafb;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .ranking {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--accent);
+        }
+
+        .nama-santri {
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .btn-delete {
+            background-color: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .empty-state {
+            padding: 30px;
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Pesantren Cahaya Fajrul Islam</h1>
+        <h2>Asesmen Anugerah CAHAYA - Milad ke-6</h2>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('penilaian')">Lembar Observasi</button>
+        <button class="tab-btn" onclick="switchTab('hasil')">Peringkat Nominasi</button>
+    </div>
+
+    <div id="penilaian" class="section active">
+        <form id="formPenilaian">
+            <div class="form-group">
+                <input type="text" id="nama" class="input-nama" required placeholder="Masukkan Nama Lengkap Santri...">
+            </div>
+            
+            <script>
+                // Fungsi pencetak opsi spesifik
+                function genOpts(name, t1, t2, t3, t4) {
+                    return `
+                    <div class="radio-group">
+                        <label class="radio-card"><input type="radio" name="${name}" value="1" required><span>${t1}</span></label>
+                        <label class="radio-card"><input type="radio" name="${name}" value="2"><span>${t2}</span></label>
+                        <label class="radio-card"><input type="radio" name="${name}" value="3"><span>${t3}</span></label>
+                        <label class="radio-card"><input type="radio" name="${name}" value="4"><span>${t4}</span></label>
+                    </div>`;
+                }
+            </script>
+
+            <div class="dimensi-box">
+                <h3 class="dimensi-title">✨ S - Dimensi Spiritual</h3>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Kesadaran Ibadah</strong></div>
+                    <script>document.write(genOpts('s1', 
+                        'Shalat jamaah karena aturan pesantren. Masih perlu dibangunkan/diingatkan.',
+                        'Shalat jamaah dan amalan wajib mandiri tanpa diawasi. Paham ini kewajiban.',
+                        'Sangat menjaga shalat di awal waktu dan merutinkan ibadah sunnah secara konsisten.',
+                        'Menjadi motor penggerak. Proaktif mengajak teman segera ke masjid sebelum azan.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Koneksi Al-Quran</strong></div>
+                    <script>document.write(genOpts('s2', 
+                        'Menyetorkan hafalan sekadar memenuhi target harian atau menghindari sanksi.',
+                        'Punya inisiatif membaca Al-Quran di waktu luang. Menyetor dengan tanggung jawab.',
+                        'Interaksi Al-Quran sangat kuat. Menikmati murajaah dan mulai mengkaji tadabbur.',
+                        'Sering memfasilitasi teman yang kesulitan menghafal atau menginisiasi kelompok murajaah.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Adab Beribadah</strong></div>
+                    <script>document.write(genOpts('s3', 
+                        'Tenang di masjid/majelis ilmu saat diawasi pengurus atau guru.',
+                        'Menjaga ketenangan dan adab di majelis secara mandiri karena sadar adab menuntut ilmu.',
+                        'Terlihat sangat khusyuk, fokus, dan meresapi setiap ibadah atau pelajaran.',
+                        'Menjadi teladan kekhusyukan dan berani menegur santun teman yang bergurau di majelis.'
+                    ));</script>
+                </div>
+            </div>
+
+            <div class="dimensi-box">
+                <h3 class="dimensi-title">💪 P - Dimensi Fisik (Physical)</h3>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Kebersihan Diri & Ruang</strong></div>
+                    <script>document.write(genOpts('p1', 
+                        'Merapikan ranjang dan lemari hanya saat ada jadwal pemeriksaan/sidak.',
+                        'Menjaga kerapian diri dan area pribadinya secara mandiri tanpa disuruh.',
+                        'Sangat apik dan konsisten, barang-barangnya selalu tertata rapi setiap saat.',
+                        'Pelopor kebersihan kamar, sering membantu merapikan area umum secara sukarela.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Energi & Stamina</strong></div>
+                    <script>document.write(genOpts('p2', 
+                        'Mengikuti olahraga karena wajib, terkadang terlihat lesu/mengantuk di kelas.',
+                        'Tampil bugar, mengikuti kegiatan dengan baik, dan jarang mengantuk saat KBM.',
+                        'Punya stamina prima, selalu antusias dan berenergi penuh dari pagi hingga malam.',
+                        'Menularkan semangat hidup sehat dan aktif mengajak teman-teman berolahraga.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Kedisiplinan Waktu</strong></div>
+                    <script>document.write(genOpts('p3', 
+                        'Patuh pada jadwal harian pesantren karena takut sanksi/teguran pengurus.',
+                        'Mandiri mengatur waktu istirahat dan disiplin mematuhi jadwal harian.',
+                        'Manajemen waktu sangat baik, tidak pernah terlambat dalam kegiatan apapun.',
+                        'Sering mengingatkan dan membantu teman sekamar untuk disiplin dan bangun tepat waktu.'
+                    ));</script>
+                </div>
+            </div>
+
+            <div class="dimensi-box">
+                <h3 class="dimensi-title">🧠 I - Dimensi Intelektual</h3>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Keingintahuan</strong></div>
+                    <script>document.write(genOpts('i1', 
+                        'Memperhatikan pelajaran, namun jarang bertanya atau pasif di kelas.',
+                        'Mulai aktif bertanya saat ada materi yang kurang dipahami dengan inisiatif sendiri.',
+                        'Rasa ingin tahu tinggi, sering berdiskusi dan mencari referensi tambahan.',
+                        'Mampu memantik diskusi berbobot dan menginspirasi teman untuk ikut berpikir kritis.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Daya Tangkap</strong></div>
+                    <script>document.write(genOpts('i2', 
+                        'Memahami instruksi dasar, butuh pengulangan untuk materi yang kompleks.',
+                        'Menyerap pelajaran dengan baik dan mengerjakan instruksi secara mandiri.',
+                        'Sangat cepat tanggap, mudah memahami konsep rumit dan menerapkannya.',
+                        'Sering menjadi tutor sebaya, mampu menjelaskan ulang materi kepada teman.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Penyelesaian Tugas</strong></div>
+                    <script>document.write(genOpts('i3', 
+                        'Menyelesaikan tugas akademik saat ditagih atau mendekati tenggat waktu.',
+                        'Menuntaskan semua amanah/tugas tepat waktu dengan penuh tanggung jawab.',
+                        'Mengerjakan tugas dengan kualitas maksimal, terencana, dan konsisten.',
+                        'Menjadi panutan penyelesaian tugas dan memotivasi kelas untuk tidak menunda.'
+                    ));</script>
+                </div>
+            </div>
+
+            <div class="dimensi-box">
+                <h3 class="dimensi-title">🤝 R - Dimensi Relasional</h3>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Adab kepada Guru & Pengasuh</strong></div>
+                    <script>document.write(genOpts('r1', 
+                        'Hormat kepada Abah/guru saat berhadapan langsung atau karena aturan.',
+                        'Menunjukkan adab, senyum, dan salam secara tulus setiap berpapasan.',
+                        'Sangat tawadhu, menjaga lisan, dan selalu memuliakan/mendoakan gurunya.',
+                        'Menjadi teladan utama dalam adab berinteraksi dengan guru yang diakui santri lain.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Empati Sosial</strong></div>
+                    <script>document.write(genOpts('r2', 
+                        'Membantu teman hanya jika diminta atau jika sedang ada waktu luang.',
+                        'Punya inisiatif mandiri meminjamkan barang/membantu teman yang kesulitan.',
+                        'Sangat peka, ringan tangan berbagi, dan memiliki empati yang mendalam.',
+                        'Proaktif mencari tahu teman yang kesusahan dan menggalang kepedulian bersama.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Kerja Sama & Kedamaian</strong></div>
+                    <script>document.write(genOpts('r3', 
+                        'Bisa membaur dengan kelompok, meski terkadang memicu perselisihan kecil.',
+                        'Kooperatif dalam piket kelompok dan sadar untuk menghindari konflik.',
+                        'Menjadi pendamai, mencairkan suasana kaku, dan tidak membalas keburukan.',
+                        'Pemimpin alami yang mampu menyatukan berbagai karakter dalam kebersamaan.'
+                    ));</script>
+                </div>
+            </div>
+
+            <div class="dimensi-box">
+                <h3 class="dimensi-title">❤️ E - Dimensi Emosional</h3>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Ketangguhan (Resiliensi)</strong></div>
+                    <script>document.write(genOpts('e1', 
+                        'Sering mengeluh saat jadwal padat, tugas menumpuk, atau mendapat teguran.',
+                        'Mampu menerima rutinitas pesantren tanpa banyak mengeluh (Acceptance).',
+                        'Sangat tangguh, sabar berproses, dan lekas bangkit dari rasa sedih/kecewa.',
+                        'Sandaran emosional bagi temannya, memberikan nasehat saat ada yang down/homesick.'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Pengendalian Diri</strong></div>
+                    <script>document.write(genOpts('e2', 
+                        'Masih terpancing emosi/marah saat antre, bercanda, atau tersinggung.',
+                        'Mampu menahan amarah, sabar menunggu giliran, dan menjaga lisan.',
+                        'Emosinya stabil, tenang menghadapi tekanan, tidak mudah terprovokasi (Reason).',
+                        'Mampu menenangkan teman yang berkonflik dan membawa rasa damai (Peace).'
+                    ));</script>
+                </div>
+                <div class="indikator-block">
+                    <div class="indikator-label"><strong>Aura Positif</strong></div>
+                    <script>document.write(genOpts('e3', 
+                        'Raut wajah biasa saja, kadang terbawa mood negatif lingkungan sekitar.',
+                        'Cukup ceria, ramah, dan tidak membawa pengaruh buruk bagi teman.',
+                        'Selalu memancarkan energi positif, tulus, dan penuh rasa syukur (Joy).',
+                        'Kehadirannya dirindukan, menjadi sumber kebahagiaan & optimisme asrama.'
+                    ));</script>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Kirim Asesmen Santri ke Database</button>
+        </form>
+    </div>
+
+    <div id="hasil" class="section">
+        <div id="hasilContainer">
+            <div style="text-align:center; padding: 40px; color: var(--primary);">Menarik data peringkat dari Firebase...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0Ez2a85ZwQLR28U-yHpVmM3o8NMxZoLI",
+      authDomain: "absensi-santri-fajrul-islam.firebaseapp.com",
+      databaseURL: "https://absensi-santri-fajrul-islam-default-rtdb.firebaseio.com",
+      projectId: "absensi-santri-fajrul-islam",
+      storageBucket: "absensi-santri-fajrul-islam.appspot.com",
+      messagingSenderId: "739928369926",
+      appId: "1:739928369926:web:7e95375c3ddba0f584cdd07"
+    };
+    
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const dbRef = firebase.database().ref('anugerah_cahaya_milad6');
+
+    let globalDataSantri = [];
+
+    dbRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        globalDataSantri = [];
+        for (let key in data) {
+            globalDataSantri.push({ key: key, ...data[key] });
+        }
+        if(document.getElementById('hasil').classList.contains('active')) {
+            renderHasil();
+        }
+    });
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+
+        if(tabId === 'hasil') { renderHasil(); }
+    }
+
+    function getRadioVal(name) {
+        let selected = document.querySelector(`input[name="${name}"]:checked`);
+        return selected ? parseInt(selected.value) : 0;
+    }
+
+    document.getElementById('formPenilaian').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = document.querySelector('.submit-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Menyimpan Data...';
+        btn.disabled = true;
+
+        let nama = document.getElementById('nama').value;
+        
+        let s = getRadioVal('s1') + getRadioVal('s2') + getRadioVal('s3');
+        let p = getRadioVal('p1') + getRadioVal('p2') + getRadioVal('p3');
+        let i = getRadioVal('i1') + getRadioVal('i2') + getRadioVal('i3');
+        let r = getRadioVal('r1') + getRadioVal('r2') + getRadioVal('r3');
+        let eVal = getRadioVal('e1') + getRadioVal('e2') + getRadioVal('e3');
+        let totalKeseluruhan = s + p + i + r + eVal;
+
+        let kategori = "";
+        let idKategori = "";
+        if (s < 6 || p < 6 || i < 6 || r < 6 || eVal < 6) {
+            kategori = "Belum Memenuhi Kriteria Teladan";
+            idKategori = "gagal";
+        } else {
+            let nilaiDimensi = [
+                { id: "s", nama: "Anugerah Cahaya Spiritual", skor: s },
+                { id: "p", nama: "Anugerah Cahaya Fisik", skor: p },
+                { id: "i", nama: "Anugerah Cahaya Intelektual", skor: i },
+                { id: "r", nama: "Anugerah Cahaya Relasional", skor: r },
+                { id: "e", nama: "Anugerah Cahaya Emosional", skor: eVal }
+            ];
+            nilaiDimensi.sort((a, b) => b.skor - a.skor);
+            kategori = nilaiDimensi[0].nama;
+            idKategori = nilaiDimensi[0].id;
+        }
+
+        let santriBaru = { 
+            nama, s, p, i, r, e: eVal, 
+            total: totalKeseluruhan, 
+            kategori, idKategori,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        dbRef.push(santriBaru).then(() => {
+            alert(`✅ Asesmen santri ${nama} berhasil tersimpan.\n\nNominasi Sistem: ${kategori}`);
+            document.getElementById('formPenilaian').reset();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }).catch((error) => {
+            alert("Terjadi kesalahan saat menyimpan: " + error.message);
+        }).finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    });
+
+    function renderHasil() {
+        let container = document.getElementById('hasilContainer');
+        container.innerHTML = '';
+
+        const daftarKategori = [
+            { idKat: 's', judul: 'Anugerah Cahaya Spiritual', kunci: 's', ikon: '✨' },
+            { idKat: 'p', judul: 'Anugerah Cahaya Fisik', kunci: 'p', ikon: '💪' },
+            { idKat: 'i', judul: 'Anugerah Cahaya Intelektual', kunci: 'i', ikon: '🧠' },
+            { idKat: 'r', judul: 'Anugerah Cahaya Relasional', kunci: 'r', ikon: '🤝' },
+            { idKat: 'e', judul: 'Anugerah Cahaya Emosional', kunci: 'e', ikon: '❤️' }
+        ];
+
+        daftarKategori.forEach(kat => {
+            let santriKategori = globalDataSantri.filter(d => d.idKategori === kat.idKat);
+            
+            santriKategori.sort((a, b) => {
+                if(b[kat.kunci] !== a[kat.kunci]) return b[kat.kunci] - a[kat.kunci];
+                if(b.total !== a.total) return b.total - a.total;
+                return a.timestamp - b.timestamp;
+            });
+
+            let top10 = santriKategori.slice(0, 10);
+
+            let htmlTabel = `
+            <div class="kategori-header">
+                <span>${kat.ikon} ${kat.judul}</span>
+                <span style="font-size:12px; font-weight:400; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:12px;">Top 10</span>
+            </div>
+            <div class="table-container">`;
+            
+            if(top10.length === 0) {
+                htmlTabel += `<div class="empty-state">Belum ada kandidat yang memenuhi kriteria di kategori ini.</div>`;
+            } else {
+                htmlTabel += `
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="60">Rank</th>
+                            <th style="text-align:left;">Nama Santri</th>
+                            <th width="120">Skor Dimensi</th>
+                            <th width="120">Total SPIRE</th>
+                            <th width="80">Hapus</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                
+                top10.forEach((santri, index) => {
+                    let rankStyle = index === 0 ? 'color:#d97706; font-size:18px;' : '';
+                    htmlTabel += `
+                        <tr>
+                            <td class="ranking" style="${rankStyle}">#${index + 1}</td>
+                            <td class="nama-santri">${santri.nama}</td>
+                            <td><strong style="color:var(--primary);">${santri[kat.kunci]}</strong> / 12</td>
+                            <td>${santri.total} / 60</td>
+                            <td><button class="btn-delete" onclick="hapusData('${santri.key}', '${santri.nama}')">✕</button></td>
+                        </tr>`;
+                });
+                
+                htmlTabel += `</tbody></table>`;
+            }
+            htmlTabel += `</div><br>`;
+            container.innerHTML += htmlTabel;
+        });
+    }
+
+    function hapusData(key, nama) {
+        if(confirm(`Yakin ingin menghapus data asesmen santri ${nama}?`)) {
+            dbRef.child(key).remove().catch(err => alert("Gagal menghapus: " + err.message));
+        }
+    }
+</script>
+
+</body>
+</html>
